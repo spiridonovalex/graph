@@ -8,7 +8,7 @@ import java.util.Map;
 public class Graph<V, E> {	
 	private final Map<V, Edge<V,E>> emptyEdges = Collections.emptyMap();
 	
-	private final Map<V, Map<V, Edge<V,E>>> vertexes = new HashMap<>();
+	private final Map<V, Map<V, Edge<V,E>>> vertices = new HashMap<>();
 	private final boolean directed;
 	
 	public static <V, E> GraphBuilder<V, E> builder(boolean directed) {
@@ -24,7 +24,7 @@ public class Graph<V, E> {
 			throw new NullPointerException();
 		}
 		
-		return vertexes.putIfAbsent(vertex, emptyEdges) == null;
+		return vertices.putIfAbsent(vertex, emptyEdges) == null;
 	}
 	
 	public Edge<V,E> addEdge(V from, V to, E payload) {
@@ -44,7 +44,7 @@ public class Graph<V, E> {
 	}
 	
 	private void addEdgeToMap(V from, V to, Edge<V,E> edge) {
-		vertexes.compute(from, this::addVertexMap).put(to, edge);
+		vertices.compute(from, this::addVertexMap).put(to, edge);
 	}
 	
 	private Map<V, Edge<V,E>> addVertexMap(V from, Map<V, Edge<V,E>> current) {
@@ -55,15 +55,15 @@ public class Graph<V, E> {
 		if (from == null || to == null) {
 			throw new NullPointerException();
 		}
-		if (!vertexes.containsKey(from)) {
+		if (!vertices.containsKey(from)) {
 			throw new UnknownVertexException(from);
 		}
-		if (!vertexes.containsKey(to)) {
+		if (!vertices.containsKey(to)) {
 			throw new UnknownVertexException(to);
 		}
 		
 		if (from.equals(to)) {
-			Edge<V, E> edge = this.vertexes.get(from).get(to);
+			Edge<V, E> edge = this.vertices.get(from).get(to);
 			return edge == null ? null : Collections.singletonList(edge);
 		}
 		
@@ -126,7 +126,7 @@ public class Graph<V, E> {
 		public boolean extend() {
 			Map<V, List<Edge<V,E>>> extension = new HashMap<>();
 			map.forEach((v, path) -> extend(v, path, extension));
-			//Exclude already existing vertexes because their traces are shorter
+			//Exclude already existing vertices because their traces are shorter
 			extension.keySet().removeAll(map.keySet());
 			if (extension.isEmpty()) {
 				//Unable to get any progress. Looks like path does not exist
@@ -137,7 +137,7 @@ public class Graph<V, E> {
 		}
 		
 		private void extend(V from, List<Edge<V,E>> currentPath, Map<V, List<Edge<V,E>>> extension) {
-			vertexes.get(from).forEach((to, edge) -> extension.put(to, Util.concat(currentPath, edge)));
+			vertices.get(from).forEach((to, edge) -> extension.put(to, Util.concat(currentPath, edge)));
 		}
 	}
 }
