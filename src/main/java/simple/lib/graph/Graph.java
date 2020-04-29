@@ -1,5 +1,6 @@
 package simple.lib.graph;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -67,8 +68,8 @@ public class Graph<V, E> {
 			return edge == null ? null : Collections.singletonList(edge);
 		}
 		
-		GraphTraces fromTraces = new GraphTraces(false, from, Collections.emptyList());
-		GraphTraces toTraces = new GraphTraces(true, to, Collections.emptyList());
+		GraphTraces fromTraces = new GraphTraces(false, from);
+		GraphTraces toTraces = new GraphTraces(true, to);
 		
 		while (true) {
 			GraphTraces toExtend;
@@ -94,11 +95,11 @@ public class Graph<V, E> {
 	}
 	
 	private class GraphTraces {
-		private final Map<V, List<Edge<V,E>>> map;
+		private final Map<V, V> map;
 		private final boolean inverted;
 		
-		public GraphTraces(boolean inverted, V initialVertex, List<Edge<V,E>> initialTrace) {
-			this.map = new HashMap<>(Collections.singletonMap(initialVertex, initialTrace));
+		public GraphTraces(boolean inverted, V initialVertex) {
+			this.map = new HashMap<>(Collections.singletonMap(initialVertex, null));
 			this.inverted = inverted;
 		}
 		
@@ -111,21 +112,32 @@ public class Graph<V, E> {
 				return traces.intersects(this);
 			}
 			
-			for (Map.Entry<V, List<Edge<V,E>>> e : map.entrySet()) {
-				List<Edge<V,E>> trace = traces.map.get(e.getKey());
-				if (trace != null) {
+			for (V key : map.keySet()) {
+				if (traces.map.containsKey(key)) {
 					return inverted ? 
-							Util.concat(trace, Util.reverse(e.getValue())) : 
-							Util.concat(e.getValue(), Util.reverse(trace));
+							Util.concat(Util.reverse(traces.toTrace(key)), toTrace(key)) : 
+							Util.concat(Util.reverse(toTrace(key)), traces.toTrace(key));
 				}
 			}
 			
 			return null;
 		}
 		
+		public List<Edge<V,E>> toTrace(V start) {
+			List<Edge<V,E>> result = new ArrayList<>();
+			V current = start;
+			V prev = map.get(current);
+			while (prev != null) {
+				result.add(vertices.get(prev).get(current));
+				current = prev;
+				prev = map.get(current);
+			}
+			return result;
+		}
+		
 		public boolean extend() {
-			Map<V, List<Edge<V,E>>> extension = new HashMap<>();
-			map.forEach((v, path) -> extend(v, path, extension));
+			Map<V, V> extension = new HashMap<>();
+			map.keySet().forEach(v -> extend(v, extension));
 			//Exclude already existing vertices because their traces are shorter
 			extension.keySet().removeAll(map.keySet());
 			if (extension.isEmpty()) {
@@ -136,8 +148,8 @@ public class Graph<V, E> {
 			return true;
 		}
 		
-		private void extend(V from, List<Edge<V,E>> currentPath, Map<V, List<Edge<V,E>>> extension) {
-			vertices.get(from).forEach((to, edge) -> extension.put(to, Util.concat(currentPath, edge)));
+		private void extend(V from, Map<V, V> extension) {
+			vertices.get(from).keySet().forEach(to -> extension.put(to, from));
 		}
 	}
 }
