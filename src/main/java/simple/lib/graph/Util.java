@@ -8,13 +8,6 @@ class Util {
 	private Util() {
 	}
 	
-	public static <V, E> List<Edge<V,E>> concat(List<Edge<V,E>> currentPath, Edge<V,E> newElement) {
-		List<Edge<V,E>> list = new ArrayList<>(currentPath.size() + 1);
-		list.addAll(currentPath);
-		list.add(newElement);
-		return list;
-	}
-	
 	public static <V, E> List<Edge<V,E>> concat(List<Edge<V,E>> currentPath, List<Edge<V,E>> addPath) {
 		List<Edge<V,E>> list = new ArrayList<>(currentPath.size() + addPath.size());
 		list.addAll(currentPath);

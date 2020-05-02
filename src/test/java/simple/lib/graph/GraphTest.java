@@ -10,30 +10,30 @@ public class GraphTest {
 	
 	@Test(expected = UnknownVertexException.class)
 	public void testEmpty() {
-		Graph.builder(true).build().getPath(1, 1);
+		new GraphBuilder<>(true).build().getPath(1, 1);
 	}
 	
 	@Test(expected = NullPointerException.class)
 	public void testSingleVertexNull() {
-		var graph = Graph.<Integer, Integer>builder(false).vertex(null).build();
+		var graph = new GraphBuilder<Integer, Integer>(false).vertex(null).build();
 		assertEquals(null, graph.getPath(1, 1));
 	}
 	
 	@Test
 	public void testSingleVertex() {
-		var graph = Graph.<Integer, Integer>builder(false).vertex(1).build();
+		var graph = new GraphBuilder<Integer, Integer>(false).vertex(1).build();
 		assertEquals(null, graph.getPath(1, 1));
 	}
 	
 	@Test
 	public void testSingleVertexCycle() {
-		var graph = Graph.<Integer, Integer>builder(true).edge(1, 1, 10).build();
+		var graph = new GraphBuilder<Integer, Integer>(true).edge(1, 1, 10).build();
 		assertEquals(Arrays.asList(new Edge<>(true, 1, 1, 10)), graph.getPath(1, 1));
 	}
 	
 	@Test
 	public void testDoubleVertexDirected() {
-		var graph = Graph.<Integer, Integer>builder(true).edge(1, 2, 10).build();
+		var graph = new GraphBuilder<Integer, Integer>(true).edge(1, 2, 10).build();
 		assertEquals(null, graph.getPath(1, 1));
 		assertEquals(Arrays.asList(new Edge<>(true, 1, 2, 10)), graph.getPath(1, 2));
 		assertEquals(null, graph.getPath(2, 1));
@@ -41,7 +41,7 @@ public class GraphTest {
 	
 	@Test
 	public void testDoubleVertexNonDirected() {
-		var graph = Graph.<Integer, Integer>builder(false).edge(1, 2, 10).build();
+		var graph = new GraphBuilder<Integer, Integer>(false).edge(1, 2, 10).build();
 		assertEquals(null, graph.getPath(1, 1));
 		assertEquals(Arrays.asList(new Edge<>(false, 1, 2, 10)), graph.getPath(1, 2));
 		assertEquals(Arrays.asList(new Edge<>(false, 1, 2, 10)), graph.getPath(2, 1));
@@ -49,7 +49,7 @@ public class GraphTest {
 	
 	@Test
 	public void testNonDirected() {
-		var graph = Graph.<Integer, Integer>builder(false)
+		var graph = new GraphBuilder<Integer, Integer>(false)
 				.edge(1, 2, 10)
 				.edge(2, 3, 10)
 				.edge(3, 4, 10)
@@ -78,7 +78,7 @@ public class GraphTest {
 	
 	@Test
 	public void testDirected() {
-		var graph = Graph.<Integer, Integer>builder(true)
+		var graph = new GraphBuilder<Integer, Integer>(true)
 				.edge(1, 2, 10)
 				.edge(2, 3, 10)
 				.edge(1, 3, 10)

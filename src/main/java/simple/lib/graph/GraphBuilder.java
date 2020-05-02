@@ -1,10 +1,10 @@
 package simple.lib.graph;
 
 public class GraphBuilder<V, E> {
-	private final Graph<V, E> graph;
+	private final GraphOnMap<V, E> graph;
 	
 	public GraphBuilder(boolean directed) {
-		this.graph = new Graph<>(directed);
+		this.graph = new GraphOnMap<>(directed);
 	}
 	
 	public GraphBuilder<V, E> edge(V from, V to, E payload) {
@@ -19,5 +19,13 @@ public class GraphBuilder<V, E> {
 	
 	public Graph<V, E> build() {
 		return graph;
+	}
+	
+	public Graph<V, E> buildImmutable() {
+		return new ImmutableGraph<>(graph);
+	}
+	
+	public Graph<V, E> buildConcurrent() {
+		return new ReadWriteGraph<>(graph);
 	}
 }
